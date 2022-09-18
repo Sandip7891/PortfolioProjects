@@ -1,21 +1,31 @@
-select location, date, total_cases, new_cases, total_deaths, population
+select sum(new_cases) total_affected, sum(new_deaths) total_death, round((sum(new_deaths)*100/sum(new_cases)),2) death_percent
 FROM coviddeaths
-order by location, date;
+where continent <> '' and location not like '%income';
 
 -- Country Wise Total Cases vs Total Deaths percentage
 
 select location, date, total_cases, total_deaths, round(total_deaths*100/total_cases,2) death_percentage
 FROM coviddeaths 
-where location = 'India'
+where continent <> '' and location not like '%income'
 order by location, date;
 
 -- Region wise highest mortality rate
 
 select location, max(total_deaths) highest_deaths, population, round(max(total_deaths*100/population),2) peak_mortality_rate
 FROM coviddeaths 
-where continent is null and location not like '%income'
+where continent = '' and location not like '%income'
 group by location, population
 order by peak_mortality_rate desc;
+
+-- Country wise highest infection percent & highest death percent
+
+SELECT location, population, max(total_cases) highest_infect,
+max(total_deaths) highest_death, round(max(total_cases)*100/population,2) peak_infect_percent,
+round(max(total_deaths)*100/population,2) peak_death_percent
+from coviddeaths
+where continent <> '' and location not like '%income'
+group by location, population
+order by peak_death_percent desc;
 
 -- Country wise vaccinations over time
 
